@@ -220,7 +220,22 @@ task_list = "I"
 name = "waterfox"
 description = "Waterfox is the privacy-focused web browser engineered to give you speed, control, and peace of mind on the internet."
 script = "browsers/waterfox.sh"
-task_list = "FI"
+task_list = "I"
+
+[[data]]
+name = "Virtualization"
+
+[[data.entries]]
+name = "Gnome-Boxes"
+description = "Gnome Boxes is a free type 2 virtualization tool."
+script = "virtualization/boxes.sh"
+task_list = "I"
+
+[[data.entries]]
+name = "VirtualBox"
+description = "VirtualBox is a type 2 virtualization tool"
+script = "virtualization/virtualbox.sh"
+task_list = "I"
 
 [[data]]
 name = "Alacritty"
