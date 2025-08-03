@@ -4,6 +4,7 @@
 
 . ../common-script.sh
 
+    # is it worth adding winetricks (in most package managers) and protontricks (flatpak for most distros)
 installDepend() {
     DEPENDENCIES='wine dbus git'
     printf "%b\n" "${YELLOW}Installing dependencies...${RC}"
@@ -27,14 +28,15 @@ installDepend() {
             $AUR_HELPER -S --needed --noconfirm $DEPENDENCIES $DISTRO_DEPS
             ;;
         apt-get | nala)
-            DISTRO_DEPS="libasound2-plugins:i386 libsdl2-2.0-0:i386 libdbus-1-3:i386 libsqlite3-0:i386 wine64 wine32 winetricks"
+            DISTRO_DEPS="libasound2-plugins:i386 libsdl2-2.0-0:i386 libdbus-1-3:i386 libsqlite3-0:i386 wine64 wine32 software-properties-common"
 
             "$ESCALATION_TOOL" dpkg --add-architecture i386
 
-            if [ "$DTYPE" != "pop" ]; then
-                "$ESCALATION_TOOL" "$PACKAGER" install -y software-properties-common
-                "$ESCALATION_TOOL" apt-add-repository contrib -y
-            fi
+    #         if [ "$DTYPE" != "pop" ]; then
+    #             "$ESCALATION_TOOL" "$PACKAGER" install -y software-properties-common
+    # # Breaks Ubuntu and some forks, Not sure its required for Debian images
+    #             "$ESCALATION_TOOL" apt-add-repository contrib -y
+    #         fi
 
             "$ESCALATION_TOOL" "$PACKAGER" update
             "$ESCALATION_TOOL" "$PACKAGER" install -y $DEPENDENCIES $DISTRO_DEPS
@@ -68,7 +70,7 @@ installAdditionalDepend() {
             DISTRO_DEPS='steam lutris goverlay'
             "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm $DISTRO_DEPS
             ;;
-        apt-get | nala)
+        apt-get | nala) # Lutris available on Ubuntu via apt/nala (Older version, best to leave as is)
             version=$(git -c 'versionsort.suffix=-' ls-remote --tags --sort='v:refname' https://github.com/lutris/lutris |
                 grep -v 'beta' |
                 tail -n1 |
@@ -85,12 +87,8 @@ installAdditionalDepend() {
             printf "%b\n" "${GREEN}Lutris Installation complete.${RC}"
             printf "%b\n" "${YELLOW}Installing steam...${RC}"
 
-            if lsb_release -i | grep -qi Debian; then
-                "$ESCALATION_TOOL" apt-add-repository non-free -y
-                "$ESCALATION_TOOL" "$PACKAGER" install steam-installer -y
-            else
-                "$ESCALATION_TOOL" "$PACKAGER" install -y steam
-            fi
+    # Debian now has Steam in the apt repostory as most other apt based distros
+           "$ESCALATION_TOOL" "$PACKAGER" install -y steam
             ;;
         dnf)
             DISTRO_DEPS='steam lutris'
