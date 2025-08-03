@@ -10,6 +10,9 @@ installVirtualBox() {
         	"$ESCALATION_TOOL" sh -c 'echo "Types: deb\nURIs: http://download.virtualbox.org/virtualbox/debian $(lsb_release -cs)\nSuites: $(lsb_release -cs 2>/dev/null)\nComponents: contrib\nArchitectures: $ARCH\nSigned-By: /usr/share/keyrings/oracle-virtualbox-2016.gpg\n" > /etc/apt/sources.list.d/virtualbox.sources'
     		"$ESCALATION_TOOL" "$PACKAGER" update
             "$ESCALATION_TOOL" "$PACKAGER" -y install virtualbox-7.1
+
+            wget -P /home/$USER/Downloads/vbox.vbox-extpack https://download.virtualbox.org/virtualbox/$(vboxmanage --version | cut -f1 -d"r")/Oracle_VirtualBox_Extension_Pack-$(vboxmanage --version | cut -f1 -d"r").vbox-extpack
+            VBoxManage extpack install vbox.vbox-extpack
             ;;
         dnf)
             "$ESCALATION_TOOL" "$PACKAGER" -y install dnf-plugins-core
@@ -19,11 +22,17 @@ installVirtualBox() {
             else
                 "$ESCALATION_TOOL" "$PACKAGER" config-manager addrepo --from-repofile=https://download.virtualbox.org/virtualbox/rpm/fedora/virtualbox.repo
             fi
-            "$ESCALATION_TOOL" "$PACKAGER" -y install virtualbox-7.1
+            "$ESCALATION_TOOL" "$PACKAGER" -y install VirtualBox-7.1.$ARCH
+            "$ESCALATION_TOOL" "$PACKAGER" -y install virtualbox-guest-additions.$ARCH
             ;;
         zypper)
-        	"$ESCALATION_TOOL" "$PACKAGER" addrepo -f https://download.virtualbox.org/virtualbox/rpm/opensuse/virtualbox.repo
-            "$ESCALATION_TOOL" "$PACKAGER" install -y virtualbox-7.1
+            if [ "$DTYPE" == "opensuse-leap" ]; then 
+        	    wget -q https://www.virtualbox.org/download/oracle_vbox_2016.asc
+                sudo rpm --import oracle_vbox_2016.asc
+               "$ESCALATION_TOOL" "$PACKAGER" addrepo -f https://download.virtualbox.org/virtualbox/rpm/opensuse/virtualbox.repo
+            fi
+            "$ESCALATION_TOOL" "$PACKAGER" install -y virtualbox
+            "$ESCALATION_TOOL" "$PACKAGER" install -y virtualbox-guest-tools
             ;;
         pacman)
         	"$ESCALATION_TOOL" "$PACKAGER" -S --noconfirm virtualbox-host-modules-arch
@@ -37,12 +46,6 @@ installVirtualBox() {
     esac
 }
 
-installVritualBoxExt() {
-# Download Virtualbox Extensions
-    wget -P /home/$USER/Downloads/vbox.vbox-extpack https://download.virtualbox.org/virtualbox/$(vboxmanage --version | cut -f1 -d"r")/Oracle_VirtualBox_Extension_Pack-$(vboxmanage --version | cut -f1 -d"r").vbox-extpack
-    VBoxManage extpack install vbox.vbox-extpack
-}
-
 virtualBoxPermissions() {
     printf "%b\n" "${YELLOW}Adding current user to the vboxusers group...${RC}"
     "$ESCALATION_TOOL" usermod -aG vboxusers "$USER"
@@ -51,5 +54,4 @@ virtualBoxPermissions() {
 checkEnv
 checkEscalationTool
 installVirtualBox
-installVritualBoxExt
 virtualBoxPermissions

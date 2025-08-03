@@ -27,7 +27,7 @@ installDepend() {
             $AUR_HELPER -S --needed --noconfirm $DEPENDENCIES $DISTRO_DEPS
             ;;
         apt-get | nala)
-            DISTRO_DEPS="libasound2-plugins:i386 libsdl2-2.0-0:i386 libdbus-1-3:i386 libsqlite3-0:i386 wine64 wine32"
+            DISTRO_DEPS="libasound2-plugins:i386 libsdl2-2.0-0:i386 libdbus-1-3:i386 libsqlite3-0:i386 wine64 wine32 winetricks"
 
             "$ESCALATION_TOOL" dpkg --add-architecture i386
 
@@ -61,6 +61,7 @@ installDepend() {
     esac
 }
 
+# Add protontricks install
 installAdditionalDepend() {
     case "$PACKAGER" in
         pacman)
