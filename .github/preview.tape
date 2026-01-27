@@ -60,11 +60,11 @@ Output preview.gif
 Require linutil
 Require sh
 
-Set Shell "bash"
-Set FontFamily "JetBrainsMono Nerd Font"
-Set FontSize 24
+Set Shell bash
+Set FontFamily "JetBrainsMono NFM"
 Set Width 1920
 Set Height 1080
+Set Theme nord
 
 Sleep 1s
 
